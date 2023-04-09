@@ -1,4 +1,5 @@
 import Models.Drone;
+import Models.ServerResponse;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -27,6 +28,9 @@ public class DroneClient {
 
             out.writeObject(drone);
 
+            ServerResponse response = (ServerResponse) in.readObject();
+
+            System.out.println(response.message);
 
         }catch (UnknownHostException e){
             System.out.println("Socket:"+e.getMessage());

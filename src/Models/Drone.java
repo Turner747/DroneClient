@@ -92,6 +92,7 @@ public class Drone implements Serializable {
         System.out.print("Enter drone id: ");
         d.setId(in.nextInt());
 
+        in.nextLine();
         System.out.print("Enter drone name: ");
         d.setName(in.nextLine());
 
