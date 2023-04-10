@@ -20,6 +20,13 @@ public class Drone implements Serializable {
         this.fire = fire;
     }
 
+    public Drone(int id, String name, int xCoordinate, int yCoordinate) {
+        this.id = id;
+        this.name = name;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
+    }
+
     public Drone(Drone drone) {
         this.id = drone.id;
         this.name = drone.name;
@@ -74,13 +81,17 @@ public class Drone implements Serializable {
 
     @Override
     public String toString() {
-        return "Models.Drone{" +
+        return "Drone{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", xCoordinate=" + xCoordinate +
                 ", yCoordinate=" + yCoordinate +
                 ", fire=" + fire +
                 '}';
+    }
+
+    public String toCsvString(){
+        return id + "," + name + "," + xCoordinate + "," + yCoordinate + "\n";
     }
 
     public static Drone createDrone(){

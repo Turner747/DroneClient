@@ -63,4 +63,8 @@ public class Fire {
                 ", severity=" + severity +
                 '}';
     }
+
+    public String toCSV() {
+        return id + "," + xCoordinate + "," + yCoordinate + "," + severity + "\n";
+    }
 }
