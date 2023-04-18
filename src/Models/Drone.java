@@ -1,6 +1,8 @@
 package Models;
 
-import java.io.Serializable;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Drone implements Serializable {
@@ -90,7 +92,7 @@ public class Drone implements Serializable {
                 '}';
     }
 
-    public String toCsvString(){
+    public String toCSV(){
         return id + "," + name + "," + xCoordinate + "," + yCoordinate + "\n";
     }
 
@@ -111,5 +113,45 @@ public class Drone implements Serializable {
         d.setYCoordinate(0);
 
         return d;
+    }
+
+    public void autoSweep(){
+
+    }
+
+    public void sendUpdate(Fire fire){
+        Socket s = null;
+        try{
+            int serverPort = 8888;
+            s = new Socket("localhost", serverPort);
+
+            ObjectInputStream in = null;
+            ObjectOutputStream out =null;
+            out =new ObjectOutputStream( s.getOutputStream());
+            in = new ObjectInputStream( s.getInputStream());
+
+            out.writeObject(new DroneMessage(this, fire, ""));
+
+            ServerResponse response = (ServerResponse) in.readObject();
+
+            System.out.println(response.getMessage());
+
+        }catch (UnknownHostException e){
+            System.out.println("Socket:"+e.getMessage());
+        }catch (EOFException e){
+            System.out.println("EOF:"+e.getMessage());
+        }catch (IOException e){
+            System.out.println("readline:"+e.getMessage());
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally {
+            if(s!=null) {
+                try {
+                    s.close();
+                }catch (IOException e){
+                    System.out.println("close:"+e.getMessage());
+                }
+            }
+        }
     }
 }

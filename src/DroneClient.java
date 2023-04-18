@@ -30,7 +30,7 @@ public class DroneClient {
 
             ServerResponse response = (ServerResponse) in.readObject();
 
-            System.out.println(response.message);
+            System.out.println(response.getMessage());
 
         }catch (UnknownHostException e){
             System.out.println("Socket:"+e.getMessage());
