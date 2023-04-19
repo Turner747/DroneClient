@@ -28,4 +28,13 @@ public class FireLocations {
         }
         return false;
     }
+
+    public Fire getFire(int x, int y){
+        for (Fire f : fires){
+            if (f.getXCoordinate() == x && f.getYCoordinate() == y){
+                return f;
+            }
+        }
+        return null;
+    }
 }

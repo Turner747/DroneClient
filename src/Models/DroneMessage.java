@@ -1,16 +1,29 @@
 package Models;
 
-public class DroneMessage {
+import java.io.Serializable;
+
+public class DroneMessage implements Serializable {
+
+    private DroneStatus status;
     private Drone drone;
     private Fire fire;
     private String message;
 
     public DroneMessage() {}
 
-    public DroneMessage(Drone drone, Fire fire, String message) {
+    public DroneMessage(DroneStatus status, Drone drone, Fire fire, String message) {
+        this.status = status;
         this.drone = drone;
         this.fire = fire;
         this.message = message;
+    }
+
+    public DroneStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DroneStatus status) {
+        this.status = status;
     }
 
     public Drone getDrone() {

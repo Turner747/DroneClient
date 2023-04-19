@@ -3,13 +3,13 @@ package Models;
 import java.io.Serializable;
 
 public class ServerResponse implements Serializable {
-    private ConnectionStatus status;
+    private DroneStatus status;
     private String message;
 
     public ServerResponse() {
     }
 
-    public ServerResponse(ConnectionStatus status, String message) {
+    public ServerResponse(DroneStatus status, String message) {
         this.status = status;
         this.message = message;
     }
@@ -19,11 +19,11 @@ public class ServerResponse implements Serializable {
         this.message = response.message;
     }
 
-    public ConnectionStatus getStatus() {
+    public DroneStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ConnectionStatus status) {
+    public void setStatus(DroneStatus status) {
         this.status = status;
     }
 

@@ -115,11 +115,7 @@ public class Drone implements Serializable {
         return d;
     }
 
-    public void autoSweep(){
-
-    }
-
-    public void sendUpdate(Fire fire){
+    public void sendUpdate(Fire fire, boolean newDrone){
         Socket s = null;
         try{
             int serverPort = 8888;
@@ -130,7 +126,13 @@ public class Drone implements Serializable {
             out =new ObjectOutputStream( s.getOutputStream());
             in = new ObjectInputStream( s.getInputStream());
 
-            out.writeObject(new DroneMessage(this, fire, ""));
+            DroneMessage message = null;
+            if (newDrone){
+                message = new DroneMessage(DroneStatus.NEW,this, fire, "");
+            }else{
+                message = new DroneMessage(DroneStatus.UPDATE,this, fire, "");
+            }
+            out.writeObject(message);
 
             ServerResponse response = (ServerResponse) in.readObject();
 

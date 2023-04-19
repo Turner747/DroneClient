@@ -1,4 +1,6 @@
+import Controllers.FireLocations;
 import Models.Drone;
+import Models.Fire;
 import Models.ServerResponse;
 
 import java.io.EOFException;
@@ -7,47 +9,67 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DroneClient {
     public static void main (String args[]) {
 
-        Socket s = null;
-
+        FireLocations fl = FireLocations.getInstance();
         Drone drone = Drone.createDrone();
+        drone.sendUpdate(null, true);
 
-        // todo: move to method
-        try{
+        final int MAX_X = 800;
+        final int MAX_Y = 500;
 
-            int serverPort = 8888;
-            s = new Socket("localhost", serverPort);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                drone.sendUpdate(null, false);
+            }
+        }, 10000, 10000);
 
-            ObjectInputStream in = null;
-            ObjectOutputStream out =null;
-            out =new ObjectOutputStream(s.getOutputStream());
-            in = new ObjectInputStream( s.getInputStream());
+        while(true){
+            if (drone.getXCoordinate() == 0 && drone.getYCoordinate() == 0){
+                for (int i = 0; i < MAX_Y; i++) {
+                    drone.setYCoordinate(i);
+                    for (int j = 0; j < MAX_X; j++) {
+                        drone.setXCoordinate(j);
 
-            out.writeObject(drone);
+                        if(fl.inList(drone.getXCoordinate(), drone.getYCoordinate())){
+                            Fire fire = new Fire(fl.getFire(drone.getXCoordinate(), drone.getYCoordinate()));
+                            drone.sendUpdate(fire, false);
+                        }
 
-            ServerResponse response = (ServerResponse) in.readObject();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            } else {
+                for (int i = drone.getYCoordinate(); i > 0; i--) {
+                    drone.setYCoordinate(i);
+                    for (int j = drone.getXCoordinate(); j > 0; j--) {
+                        drone.setXCoordinate(j);
 
-            System.out.println(response.getMessage());
+                        if(fl.inList(drone.getXCoordinate(), drone.getYCoordinate())){
+                            Fire fire = new Fire(fl.getFire(drone.getXCoordinate(), drone.getYCoordinate()));
+                            drone.sendUpdate(fire, false);
+                        }
 
-        }catch (UnknownHostException e){
-            System.out.println("Socket:"+e.getMessage());
-        }catch (EOFException e){
-            System.out.println("EOF:"+e.getMessage());
-        }catch (IOException e){
-            System.out.println("readline:"+e.getMessage());
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }finally {
-            if(s!=null) {
-                try {
-                    s.close();
-                }catch (IOException e){
-                    System.out.println("close:"+e.getMessage());
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                 }
             }
+
         }
+
     }
 }
