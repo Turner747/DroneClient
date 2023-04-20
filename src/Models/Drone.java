@@ -10,17 +10,10 @@ public class Drone implements Serializable {
     private String name;
     private int xCoordinate;
     private int yCoordinate;
-    private Fire fire;
+    private String socketId;
+    private final int SERVER_PORT = 8888;
 
     public Drone() {}
-
-    public Drone(int id, String name, int xCoordinate, int yCoordinate, Fire fire) {
-        this.id = id;
-        this.name = name;
-        this.xCoordinate = xCoordinate;
-        this.yCoordinate = yCoordinate;
-        this.fire = fire;
-    }
 
     public Drone(int id, String name, int xCoordinate, int yCoordinate) {
         this.id = id;
@@ -29,12 +22,20 @@ public class Drone implements Serializable {
         this.yCoordinate = yCoordinate;
     }
 
+    public Drone(int id, String name, int xCoordinate, int yCoordinate, String socketId) {
+        this.id = id;
+        this.name = name;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
+        this.socketId = socketId;
+    }
+
     public Drone(Drone drone) {
         this.id = drone.id;
         this.name = drone.name;
         this.xCoordinate = drone.xCoordinate;
         this.yCoordinate = drone.yCoordinate;
-        this.fire = drone.fire;
+        this.socketId = drone.socketId;
     }
 
     public int getId() {
@@ -69,16 +70,12 @@ public class Drone implements Serializable {
         this.yCoordinate = yCoordinate;
     }
 
-    public Fire getFire() {
-        return fire;
+    public String getSocketId() {
+        return socketId;
     }
 
-    public void setFire(Fire fire) {
-        this.fire = fire;
-    }
-
-    public boolean fireSpotted() {
-        return fire != null;
+    public void setSocketId(String socketId) {
+        this.socketId = socketId;
     }
 
     @Override
@@ -88,7 +85,7 @@ public class Drone implements Serializable {
                 ", name='" + name + '\'' +
                 ", xCoordinate=" + xCoordinate +
                 ", yCoordinate=" + yCoordinate +
-                ", fire=" + fire +
+                ", socketId=" + socketId +
                 '}';
     }
 
@@ -115,11 +112,11 @@ public class Drone implements Serializable {
         return d;
     }
 
-    public void sendUpdate(Fire fire, boolean newDrone){
-        Socket s = null;
+    public Socket sendUpdate(Fire fire, boolean newDrone, Socket s){
+
         try{
-            int serverPort = 8888;
-            s = new Socket("localhost", serverPort);
+            if (s == null)
+                s = new Socket("localhost", SERVER_PORT);
 
             ObjectInputStream in = null;
             ObjectOutputStream out =null;
@@ -146,14 +143,12 @@ public class Drone implements Serializable {
             System.out.println("readline:"+e.getMessage());
         }catch(Exception ex){
             ex.printStackTrace();
-        }finally {
-            if(s!=null) {
-                try {
-                    s.close();
-                }catch (IOException e){
-                    System.out.println("close:"+e.getMessage());
-                }
-            }
         }
+        return s;
+    }
+
+    public void goToLocation(int x, int y){
+        this.xCoordinate = x;
+        this.yCoordinate = y;
     }
 }
