@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DroneClient {
     public static void main (String args[]) {
@@ -14,52 +16,48 @@ public class DroneClient {
         FireLocations fl = FireLocations.getInstance();
         Drone drone = Drone.createDrone();
         Socket s = drone.sendUpdate(null, true, null);
+        System.out.println((s.toString()));
 
         final int MAX_X = 800;
         final int MAX_Y = 500;
 
         Thread listener = new Thread(() -> {
-            //while(true){
-                try {
-                    ObjectInputStream in = new ObjectInputStream( s.getInputStream() );
 
-                    DroneMessage inMessage = (DroneMessage) in.readObject();
+            try {
+                ObjectInputStream in = new ObjectInputStream( s.getInputStream() );
+                ObjectOutputStream out = new ObjectOutputStream( s.getOutputStream() );
 
-                    Drone inDrone = inMessage.getDrone();
+                DroneMessage inMessage = (DroneMessage) in.readObject();
+                System.out.println("Received message from server: " + inMessage.getMessage());
 
-                    if (inMessage.getStatus() == DroneStatus.DELETE) {
-                        System.out.println("Drone shut down from server");
-                        System.exit(0);
-                    }
+                Drone inDrone = inMessage.getDrone();
 
-                    if (inMessage.getStatus() == DroneStatus.UPDATE){
-                        drone.goToLocation(inDrone.getXCoordinate(), inDrone.getYCoordinate());
-                    }
-
-                    //try {
-                        ObjectOutputStream out = new ObjectOutputStream( s.getOutputStream() );
-                        DroneMessage outMessage = new DroneMessage();
-                        outMessage.setStatus(DroneStatus.SUCCESS);
-                        outMessage.setMessage("Drone update successful");
-                        out.writeObject(outMessage);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-
-//                    if (inMessage != null){
-//                        Thread messageHandler = new Thread(() -> {
-//
-//                        });
-//                        messageHandler.start();
-//                    }
-
-                } catch (IOException e) {
-                    // Handle any exceptions
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                if (inMessage.getStatus() == DroneStatus.DELETE) {
+                    System.out.println("Drone shut down from server");
+                    System.exit(0);
                 }
-            //}
+
+                if (inMessage.getStatus() == DroneStatus.UPDATE) {
+                    drone.goToLocation(inDrone.getXCoordinate(), inDrone.getYCoordinate());
+                }
+
+                try {
+                    DroneMessage outMessage = new DroneMessage();
+                    outMessage.setStatus(DroneStatus.SUCCESS);
+                    outMessage.setDrone(drone);
+                    outMessage.setMessage("Drone update successful");
+                    out.writeObject(outMessage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
 
         });
         listener.start();

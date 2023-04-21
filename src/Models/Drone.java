@@ -11,7 +11,6 @@ public class Drone implements Serializable {
     private int xCoordinate;
     private int yCoordinate;
     private String socketId;
-    private final int SERVER_PORT = 8888;
 
     public Drone() {}
 
@@ -113,13 +112,13 @@ public class Drone implements Serializable {
     }
 
     public Socket sendUpdate(Fire fire, boolean newDrone, Socket s){
-
         try{
+            final int SERVER_PORT = 8888;
             if (s == null)
                 s = new Socket("localhost", SERVER_PORT);
 
             ObjectInputStream in = null;
-            ObjectOutputStream out =null;
+            ObjectOutputStream out = null;
             out =new ObjectOutputStream( s.getOutputStream());
             in = new ObjectInputStream( s.getInputStream());
 

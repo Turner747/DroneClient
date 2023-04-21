@@ -13,7 +13,7 @@ public class FireLocations {
     private FireLocations() {
         fires = new ArrayList<>();
 
-        fires.add(new Fire(1, 45, 34, 1));
+        fires.add(new Fire(1, 0, 0, 1));
         fires.add(new Fire(2, 105, 53, 4));
         fires.add(new Fire(3, 45, 27, 4));
         fires.add(new Fire(4, 66, 11, 2));
